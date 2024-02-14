@@ -218,6 +218,11 @@ class Base extends CoreBase {
          */
         keys_: null,
         /**
+         * Gets used inside afterSetIsLoading() to define the CSS for the loading spinner icon
+         * @member {String[]} loadingSpinnerCls_=['fa','fa-spinner','fa-spin']
+         */
+        loadingSpinnerCls_: ['fa', 'fa-spinner', 'fa-spin'],
+        /**
          * Shortcut for style.maxHeight, defaults to px
          * @member {Number|String|null} maxHeight_=null
          */
@@ -702,7 +707,7 @@ class Base extends CoreBase {
                     cn : [{
                         cls: ['neo-load-mask-body'],
                         cn : [{
-                            cls: ['fa', 'fa-spinner', 'fa-spin']
+                            cls: me.loadingSpinnerCls
                         }, {
                             cls      : ['neo-loading-message'],
                             html     : value,
@@ -798,12 +803,6 @@ class Base extends CoreBase {
             else {
                 me.revertFocus();
             }
-        }
-    }
-
-    revertFocus() {
-        if (this.containsFocus && this.focusEnterData?.relatedTarget) {
-            Neo.getComponent(this.focusEnterData.relatedTarget.id)?.focus();
         }
     }
 
@@ -1838,13 +1837,19 @@ class Base extends CoreBase {
         this.keys?.register(this)
     }
 
+    /**
+     * @param {Object} data
+     */
     onFocusEnter(data) {
         // If we are hidden, or unmounted while we still contain focus, we have to revert
         // focus to where it came from if possible
         this.focusEnterData = data;
     }
 
-    onFocusLeave() {
+    /**
+     * @param {Object} data
+     */
+    onFocusLeave(data) {
         this.focusEnterData = null;
     }
 
@@ -2064,6 +2069,17 @@ class Base extends CoreBase {
                 Neo.getComponent(id)?.update();
                 NeoArray.remove(me.childUpdateCache, id)
             })
+        }
+    }
+
+    /**
+     *
+     */
+    revertFocus() {
+        let relatedTarget = this.focusEnterData?.relatedTarget;
+
+        if (this.containsFocus && relatedTarget) {
+            Neo.getComponent(relatedTarget.id)?.focus()
         }
     }
 

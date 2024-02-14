@@ -328,6 +328,15 @@ class Base {
     }
 
     /**
+     * Check if a given ntype exists inside the proto chain, including the top level class
+     * @param {String} ntype
+     * @returns {Boolean}
+     */
+    hasNtype(ntype) {
+        return this.constructor.ntypeChain.includes(ntype)
+    }
+
+    /**
      * Gets triggered after onConstructed() is done
      * @see {@link Neo.core.Base#onConstructed onConstructed}
      * @tutorial 02_ClassSystem
@@ -361,7 +370,7 @@ class Base {
             currentWorker = Neo.currentWorker,
             listenerId;
 
-        if (!me.singleton) {
+        if (!me.singleton && !me.isMainThreadAddon) {
             throw new Error('Remote method access is only functional for Singleton classes ' + className)
         }
 

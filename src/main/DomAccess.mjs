@@ -88,6 +88,7 @@ class DomAccess extends Base {
                 'getScrollingDimensions',
                 'measure',
                 'monitorAutoGrow',
+                'monitorAutoGrowHandler',
                 'navigate',
                 'navigateTo',
                 'scrollBy',
@@ -362,9 +363,8 @@ class DomAccess extends Base {
         if (node) {
             // The children property means focus inner elements if possible.
             if (!DomUtils.isFocusable(node) && data.children) {
-                // Prefer to focus input fields over buttons.
-                // querySelector('input,textarea,button') returns buttons first, so use multiple calls. 
-                node = node.querySelector('input:not(:disabled)') || node.querySelector('textarea:not(:disabled)') || node.querySelector('button:not(:disabled)') || [...node.querySelectorAll('*')].find(DomUtils.isFocusable);
+                // query for the first focusable decendent
+                node = DomUtils.query(node, DomUtils.isFocusable);
             }
             if (node) {
                 node.focus();
@@ -638,8 +638,15 @@ class DomAccess extends Base {
         })
     }
 
-    monitorAutoGrowHandler({ target }) {
+    /**
+     *
+     * @param {Event|Object} data
+     * @param {String} [data.id]
+     * @param {HTMLElement} [data.target]
+     */
+    monitorAutoGrowHandler(data) {
         const
+            target                 = data.target || this.getElement(data.id),
             { style }              = target,
             { style : inputStyle } = target.closest('.neo-textarea');
 
